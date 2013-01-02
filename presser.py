@@ -62,12 +62,13 @@ def score_board(board, colors, player):
     return (score, False)
 
 if __name__ == "__main__":
-    board = ''.join(TEST_BOARD.split())
-    #if len(sys.argv) == 3:
-    #    rack = sys.argv[1].strip()
-    #    colors = sys.argv[2].strip()
-    #else:
-    #    exit()
-    #anagrams, max_length = load_anagrams()
-    #target_words = set(find_words(rack, anagrams, max_length))
+    import sys
+    if len(sys.argv) == 2:
+        rack = sys.argv[1].strip()
+    else:
+        exit()
+    anagrams, max_length = load_anagrams()
+    target_words = set(find_words(rack, anagrams, max_length))
+    big_words = [word for word in target_words if len(word) > 10]
+    print(big_words)
 
