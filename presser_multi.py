@@ -1,5 +1,7 @@
 from itertools import combinations
 import collections
+import concurrent.futures
+import itertools
 
 def load_anagrams():
     anagrams = collections.defaultdict(list)
@@ -11,16 +13,29 @@ def load_anagrams():
             lengths.add(len(words[0]))
     return (anagrams, max(lengths))
 
+def find_words_of_length(anagrams, board, length):
+    target_words = []
+    for combination in combinations(board, length):
+        if combination in anagrams:
+            target_words += anagrams[combination]
+    print(length)
+    return target_words
+
 
 def find_words(board, anagrams, max_length):
-    board = ''.join(sorted(board))
+
     target_words = []
-    for word_length in range(3, max_length + 1):
-        print(word_length)
-        for combination in combinations(board, word_length):
-            if combination in anagrams:
-                target_words += anagrams[combination]
+    board = ''.join(sorted(board))
+    word_lengths = list(range(3, max_length + 1))
+    board_argument = itertools.repeat(board)
+    anagrams_argument = itertools.repeat(anagrams)
+    with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
+        futures = [executor.submit(find_words_of_length, anagrams, board, length) for length in word_lengths]
+        for future in concurrent.futures.as_completed(futures):
+            target_words += future.result()
+
     return target_words
+
 
 def is_corner(position):
     return position in [0, 4, 20, 24]
